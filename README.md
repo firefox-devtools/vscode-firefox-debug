@@ -138,7 +138,7 @@ __OS X__
 
 __Linux__
 
-`firefox -start-debugger-server`
+`firefox --start-debugger-server`
 
 Navigate to your web application and use this `launch.json` configuration to attach to Firefox:
 ```json
