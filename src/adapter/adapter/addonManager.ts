@@ -23,6 +23,7 @@ export class AddonManager {
 
 	private addonAttached = false;
 	private addonActor: TabActorProxy | undefined = undefined;
+	private webExtensionActor: WebExtensionActorProxy | undefined = undefined;
 
 	constructor(
 		private readonly enableCRAWorkaround: boolean,
@@ -53,11 +54,11 @@ export class AddonManager {
 	}
 
 	public async reloadAddon(): Promise<void> {
-		if (!this.addonActor) {
+		if (!this.webExtensionActor) {
 			throw 'Addon isn\'t attached';
 		}
 
-		await this.addonActor.reload();
+		await this.webExtensionActor.reload();
 	}
 
 	private async fetchAddonsAndAttach(rootActor: RootActorProxy, useConnect: boolean): Promise<void> {
@@ -73,14 +74,14 @@ export class AddonManager {
 				(async () => {
 
 					let consoleActor: ConsoleActorProxy;
-					let webExtensionActor = new WebExtensionActorProxy(
+					this.webExtensionActor = new WebExtensionActorProxy(
 						addon, this.enableCRAWorkaround, this.debugSession.pathMapper,
 						this.debugSession.firefoxDebugConnection);
 
 					if (useConnect) {
-						[this.addonActor, consoleActor] = await webExtensionActor.connect();
+						[this.addonActor, consoleActor] = await this.webExtensionActor.connect();
 					} else {
-						[this.addonActor, consoleActor] = await webExtensionActor.getTarget();
+						[this.addonActor, consoleActor] = await this.webExtensionActor.getTarget();
 					}
 
 					let threadAdapter = await this.debugSession.attachTabOrAddon(
