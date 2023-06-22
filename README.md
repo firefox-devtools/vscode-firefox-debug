@@ -128,17 +128,17 @@ Then close Firefox and start it from a terminal like this:
 
 __Windows__
 
-`"C:\Program Files\Mozilla Firefox\firefox.exe" -start-debugger-server`
+`"C:\Program Files\Mozilla Firefox\firefox.exe" --start-debugger-server`
 
 (This syntax is for a regular command prompt (cmd.exe), not PowerShell!)
 
 __OS X__
 
-`/Applications/Firefox.app/Contents/MacOS/firefox -start-debugger-server`
+`/Applications/Firefox.app/Contents/MacOS/firefox --start-debugger-server`
 
 __Linux__
 
-`firefox -start-debugger-server`
+`firefox --start-debugger-server`
 
 Navigate to your web application and use this `launch.json` configuration to attach to Firefox:
 ```json
