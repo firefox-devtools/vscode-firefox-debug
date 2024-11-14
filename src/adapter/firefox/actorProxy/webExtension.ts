@@ -16,6 +16,7 @@ let log = Log.create('WebExtensionActorProxy');
 export class WebExtensionActorProxy extends EventEmitter implements ActorProxy {
 
 	private pendingConnectRequests = new PendingRequests<[TabActorProxy, ConsoleActorProxy]>();
+	private pendingReloadRequests = new PendingRequests<void>();
 
 	constructor(
 		private readonly webExtensionInfo: FirefoxDebugProtocol.Addon,
@@ -51,6 +52,16 @@ export class WebExtensionActorProxy extends EventEmitter implements ActorProxy {
 		})
 	}
 
+	public reload(): Promise<void> {
+
+		log.debug(`Reloading ${this.name}`);
+
+		return new Promise<void>((resolve, reject) => {
+			this.pendingReloadRequests.enqueue({ resolve, reject });
+			this.connection.sendRequest({ to: this.name, type: 'reload' });
+		});
+	}
+
 	public receiveResponse(response: FirefoxDebugProtocol.Response): void {
 
 		if (response['form']) {
@@ -74,7 +85,12 @@ export class WebExtensionActorProxy extends EventEmitter implements ActorProxy {
 					this.connection.sendRequest({ to: this.name, type: 'connect' });
 				}, 100);
 			}
-			
+
+		} else if (Object.keys(response).length === 2) {
+
+			log.debug('Received response to reload request');
+			this.pendingReloadRequests.resolveOne(undefined);
+
 		} else {
 
 			log.warn("Unknown message from WebExtensionActor: " + JSON.stringify(response));
