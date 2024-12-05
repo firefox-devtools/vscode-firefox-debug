@@ -116,6 +116,12 @@ export class ObjectGripActorProxy implements ActorProxy {
 			log.warn(`No such actor ${this.grip.actor} - you will not be able to inspect this value; this is probably due to Firefox bug #1249962`);
 			this.pendingPrototypeAndPropertiesRequests.rejectAll('No such actor');
 
+
+		} else if (response['error'] && (typeof response['message'] === 'string') && response['message'].includes('threadGrip')) {
+
+			log.warn('threadGrip not implemented in Firefox');
+			this.pendingVoidRequests.rejectOne('threadGrip not implemented in Firefox');
+
 		} else {
 
 			log.warn("Unknown message from ObjectGripActor: " + JSON.stringify(response));
